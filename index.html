@@ -365,23 +365,23 @@
     const ORIGINAL_CARDS = [
         { type: "image", value: "https://picsum.photos/id/104/300/300" },   
         { type: "text",  value: "Hellen, te amo como nunca antes habia amado a otra persona, sos todo para mi, esto lo hago para que siempre lo recuerdes amor." },
-        { type: "image", value: "4.png" },   
+        { type: "image", value: "./4.png" },   
         { type: "text",  value: "Quiero una foto de una teta ahora mismo" },
-        { type: "image", value: "5.png" },   
+        { type: "image", value: "./5.png" },   
         { type: "text",  value: "Grabate haciendo 20 centadillas y envia el video a tu novio" },
-        { type: "image", value: "6.png" },    
+        { type: "image", value: "./6.png" },    
         { type: "text",  value: "Pidele a tu novio la foto que quieras, solo hoy" },
-        { type: "image", value: "7.png" },    
+        { type: "image", value: "./7.jpg" },    
         { type: "text",  value: "¿Sabes por te amo tanto?, te amo tanto porque eres esa niña que siempre estuve esperando a que llegara, te amo tanto porque a pesar de todos los problemas que tienes, siempre estas dispuesta a ayudarme, apoyarme en todo, te preocupas por mi. Y no te amo solo por eso mi amor, te amo tambien porque eres super hermosa, me encata tu cintura, tu sonrisa, tu voz, tu caracter, me encata todo de dia, y cada dia que pasa me enamoro mucho mas de lo que te imaginas." },
-        { type: "image", value: "1.png" },     
+        { type: "image", value: "./1.png" },     
         { type: "text",  value: "Amor podes decirme otra vez cuanto me queres? Amo cuando lo haces" },
-        { type: "image", value: "2.png" },     
+        { type: "image", value: "./2.png" },     
         { type: "text",  value: "Si desbloqueas esta carta el 30 de este mes, tienes un cupon de 300k en Shein" },
-        { type: "image", value: "3.png" },     
+        { type: "image", value: "./3.png" },     
         { type: "text",  value: "Cual es la foto tuya que mas te gusta?" },
-        { type: "image", value: "8.png" },     
+        { type: "image", value: "./8.png" },     
         { type: "text",  value: "Amor podes hacerme la pregunta que quieras" },
-        { type: "image", value: "9.png" },     
+        { type: "image", value: "./9.png" },     
         { type: "text",  value: "¿Que te gusta mas de mi?" }
     ];
     const TOTAL = 20;
@@ -764,7 +764,7 @@
     window.handleCardClick = handleCardClick;
 
     // Fondo rotatorio con imágenes femeninas
-    const BACKGROUND_IMAGES = ["1.png", "2.png", "3.png"];
+    const BACKGROUND_IMAGES = ["./1.png", "./2.png", "./3.png"];
     let currentBgIndex = 0, bgInterval = null;
     function setBackgroundImage(url) { document.body.style.backgroundImage = `url('${url}')`; }
     function rotateBackground() { currentBgIndex = (currentBgIndex + 1) % BACKGROUND_IMAGES.length; setBackgroundImage(BACKGROUND_IMAGES[currentBgIndex]); }
