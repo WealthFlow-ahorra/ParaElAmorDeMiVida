@@ -84,12 +84,15 @@
         .stats {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             background: rgba(255, 225, 235, 0.85);
             border-radius: 60px;
             padding: 0.5rem 1.2rem;
             margin: 1rem 0;
             border: 1px solid #FFB7C5;
             backdrop-filter: blur(4px);
+            gap: 8px;
+            flex-wrap: wrap;
         }
         .progress {
             background: #FFB3C6;
@@ -108,6 +111,20 @@
             color: #B13E5C;
             font-weight: 600;
         }
+        .reset-btn {
+            background: #FFB3C6;
+            border: none;
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            color: #631D38;
+            cursor: pointer;
+            transition: 0.1s linear;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .reset-btn:active { transform: scale(0.96); }
+        .reset-btn.hidden { display: none; }
 
         .cards-grid {
             display: grid;
@@ -260,7 +277,6 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        /* Tutorial con botón Siguiente */
         .tutorial-overlay {
             position: fixed;
             top: 0;
@@ -308,7 +324,6 @@
             font-size: 1rem;
             color: #631D38;
             cursor: pointer;
-            transition: 0.1s linear;
         }
         .btn-restart {
             background: transparent;
@@ -336,6 +351,7 @@
             .title { font-size: 1.5rem; }
             .msg-area { font-size: 0.85rem; padding: 0.7rem; min-height: 60px; }
             .tutorial-card { font-size: 1rem; padding: 1.5rem; }
+            .stats { justify-content: center; }
         }
     </style>
 </head>
@@ -347,6 +363,7 @@
     <div class="stats">
         <div class="progress">🎀 <span id="progressCount">0</span> / 20</div>
         <div class="daily">💖 <span id="dailyMsg">disponible</span></div>
+        <button id="resetGameBtn" class="reset-btn">🔄 Reiniciar juego</button>
     </div>
     <div class="cards-grid" id="cardsGrid"></div>
     <div class="msg-area" id="globalMsg">💗 Toca una carta oculta para descubrir su secreto (1 por día)</div>
@@ -385,7 +402,7 @@
         { type: "text",  value: "¿Que te gusta mas de mi?" }
     ];
     const TOTAL = 20;
-    const MAX_REPEATS = 2;  // Solo se puede repetir el tutorial 2 veces como máximo
+    const MAX_REPEATS = 2;
 
     let currentCardsData = [];
     let unlocked = new Array(TOTAL).fill(false);
@@ -394,34 +411,35 @@
     let gameInitialized = false;
     let tutorialActive = false;
 
+    // --- Botón de reinicio: aparece solo una vez ---
+    const RESET_BUTTON_FLAG = 'reset_button_hidden_forever';
+
+    function shouldHideResetButton() {
+        return localStorage.getItem(RESET_BUTTON_FLAG) === 'true';
+    }
+
+    function markResetButtonAsShown() {
+        localStorage.setItem(RESET_BUTTON_FLAG, 'true');
+    }
+
     // --- Contador de repeticiones (persistente) ---
     function getRepeatCount() {
         const count = localStorage.getItem('tutorial_repeat_count');
         return count !== null ? parseInt(count, 10) : 0;
     }
-
     function incrementRepeatCount() {
         let current = getRepeatCount();
-        if (current < MAX_REPEATS) {
-            localStorage.setItem('tutorial_repeat_count', current + 1);
-        }
+        if (current < MAX_REPEATS) localStorage.setItem('tutorial_repeat_count', current + 1);
     }
-
-    function canStillRepeat() {
-        return getRepeatCount() < MAX_REPEATS;
-    }
+    function canStillRepeat() { return getRepeatCount() < MAX_REPEATS; }
 
     // --- Sonidos emocionantes ---
     let audioCtx = null;
     let soundEnabled = false;
-
     function initAudio() {
         if (audioCtx) return;
-        try {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        } catch(e) { console.warn("Web Audio no soportado"); }
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
     }
-
     function playSound(type) {
         if (!soundEnabled || !audioCtx) return;
         const now = audioCtx.currentTime;
@@ -434,33 +452,23 @@
         if (type === 'flip') {
             osc.frequency.value = 880;
             osc.frequency.exponentialRampToValueAtTime(440, now + 0.2);
-            osc.start(now);
-            osc.stop(now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
         } else if (type === 'reveal') {
             osc.frequency.value = 523.25;
             osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.25);
-            osc.start(now);
-            osc.stop(now + 0.35);
+            osc.start(now); osc.stop(now + 0.35);
         } else if (type === 'shuffle') {
             osc.frequency.value = 300;
             osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
-            osc.start(now);
-            osc.stop(now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
         }
     }
-
     function enableSoundOnFirstTouch() {
         if (soundEnabled) return;
         initAudio();
         if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => {
-                soundEnabled = true;
-                playSound('reveal');
-            }).catch(e=>console.log);
-        } else if (audioCtx) {
-            soundEnabled = true;
-            playSound('reveal');
-        }
+            audioCtx.resume().then(() => { soundEnabled = true; playSound('reveal'); }).catch(e=>console.log);
+        } else if (audioCtx) { soundEnabled = true; playSound('reveal'); }
     }
 
     // Utilidades
@@ -472,19 +480,16 @@
         }
         return array;
     }
-
     function getTodayStr() {
         const d = new Date();
         return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
-
     function persistFullState() {
         localStorage.setItem('hellen_cardOrder', JSON.stringify(currentCardsData));
         localStorage.setItem('hellen_unlocked', JSON.stringify(unlocked));
         if (lastUnlockDate) localStorage.setItem('hellen_lastDate', lastUnlockDate);
         else localStorage.removeItem('hellen_lastDate');
     }
-
     function loadFullState() {
         const storedOrder = localStorage.getItem('hellen_cardOrder');
         const storedUnlocked = localStorage.getItem('hellen_unlocked');
@@ -507,6 +512,22 @@
         else lastUnlockDate = null;
     }
 
+    // Manejo de imágenes rotas
+    function setImageWithFallback(imgElement, src) {
+        imgElement.src = src;
+        imgElement.onerror = () => {
+            imgElement.onerror = null;
+            imgElement.style.objectFit = "contain";
+            imgElement.style.padding = "1rem";
+            const parent = imgElement.parentElement;
+            const fallbackDiv = document.createElement('div');
+            fallbackDiv.className = 'card-text';
+            fallbackDiv.innerText = '🌸 Imagen no disponible, pero el amor sí 🌸';
+            parent.innerHTML = '';
+            parent.appendChild(fallbackDiv);
+        };
+    }
+
     function rebuildGridUI() {
         gridContainer.innerHTML = '';
         cardElements = [];
@@ -521,8 +542,7 @@
             front.className = 'card-front';
             if (data.type === 'image') {
                 const img = document.createElement('img');
-                img.src = data.value;
-                img.alt = `sorpresa ${i+1}`;
+                setImageWithFallback(img, data.value);
                 front.appendChild(img);
             } else {
                 const textSpan = document.createElement('div');
@@ -559,6 +579,18 @@
     function allUnlocked() { return unlocked.every(v => v === true); }
     function canUnlockNew() { return !hasUnlockedToday() && !allUnlocked(); }
 
+    // RESET TOTAL (borra solo datos del juego, NO la bandera del botón)
+    function fullReset() {
+        // Eliminar solo las claves relacionadas con el juego
+        localStorage.removeItem('hellen_cardOrder');
+        localStorage.removeItem('hellen_unlocked');
+        localStorage.removeItem('hellen_lastDate');
+        localStorage.removeItem('onboarding_complete');
+        localStorage.removeItem('tutorial_repeat_count');
+        // La bandera del botón se conserva
+        window.location.reload();
+    }
+
     function showFullContent(idx) {
         if (!unlocked[idx] && !allUnlocked()) return;
         playSound('reveal');
@@ -566,8 +598,8 @@
         modalContentDiv.innerHTML = '';
         if (data.type === 'image') {
             const imgBig = document.createElement('img');
-            imgBig.src = data.value;
             imgBig.className = 'modal-img';
+            setImageWithFallback(imgBig, data.value);
             modalContentDiv.appendChild(imgBig);
         } else {
             const txtBig = document.createElement('div');
@@ -577,85 +609,44 @@
         }
         modal.style.display = 'flex';
     }
-
     function closeModal() { modal.style.display = 'none'; }
 
-    // ---------- TUTORIAL PASO A PASO CON BOTÓN "SIGUIENTE" Y REPETICIÓN LIMITADA ----------
+    // ---------- TUTORIAL ----------
     async function startTutorial() {
         if (tutorialActive) return;
         tutorialActive = true;
         gameInitialized = false;
-        
-        // Aseguramos todas las cartas boca abajo
         for (let i = 0; i < TOTAL; i++) if (cardElements[i]) cardElements[i].classList.remove('flipped');
         
-        // Función para mostrar un paso con solo botón siguiente
-        const showStep = (message) => {
-            return new Promise((resolve) => {
-                const overlay = document.createElement('div');
-                overlay.className = 'tutorial-overlay';
-                const card = document.createElement('div');
-                card.className = 'tutorial-card';
-                card.innerHTML = `<p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next" id="nextStepBtn">Siguiente</button></div>`;
-                overlay.appendChild(card);
-                document.body.appendChild(overlay);
-                const nextBtn = document.getElementById('nextStepBtn');
-                const cleanup = () => {
-                    overlay.remove();
-                    resolve();
-                };
-                nextBtn.onclick = cleanup;
-            });
-        };
-
-        // Función para paso con posible botón repetir (solo si aún se puede repetir)
-        const showStepWithOptionalRestart = (message) => {
-            return new Promise((resolve) => {
-                const canRepeat = canStillRepeat();
-                const overlay = document.createElement('div');
-                overlay.className = 'tutorial-overlay';
-                const card = document.createElement('div');
-                card.className = 'tutorial-card';
-                if (canRepeat) {
-                    card.innerHTML = `<p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next" id="nextStepBtn">Siguiente</button><button class="btn-restart" id="restartTutoBtn">Repetir explicación</button></div>`;
-                } else {
-                    card.innerHTML = `<p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next" id="nextStepBtn">Siguiente</button></div>`;
-                }
-                overlay.appendChild(card);
-                document.body.appendChild(overlay);
-                const nextBtn = document.getElementById('nextStepBtn');
-                const restartBtn = document.getElementById('restartTutoBtn');
-                const cleanup = (restart = false) => {
-                    overlay.remove();
-                    resolve(restart);
-                };
-                nextBtn.onclick = () => cleanup(false);
-                if (restartBtn) restartBtn.onclick = () => {
-                    incrementRepeatCount();  // se usa una repetición
-                    cleanup(true);
-                };
-            });
-        };
-
-        // Pasos iniciales
+        const showStep = (message) => new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'tutorial-overlay';
+            overlay.innerHTML = `<div class="tutorial-card"><p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next">Siguiente</button></div></div>`;
+            document.body.appendChild(overlay);
+            overlay.querySelector('.btn-next').onclick = () => { overlay.remove(); resolve(); };
+        });
+        const showStepWithOptionalRestart = (message) => new Promise((resolve) => {
+            const canRepeat = canStillRepeat();
+            const overlay = document.createElement('div');
+            overlay.className = 'tutorial-overlay';
+            overlay.innerHTML = `<div class="tutorial-card"><p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next">Siguiente</button>${canRepeat ? '<button class="btn-restart">Repetir explicación</button>' : ''}</div></div>`;
+            document.body.appendChild(overlay);
+            const nextBtn = overlay.querySelector('.btn-next');
+            const restartBtn = overlay.querySelector('.btn-restart');
+            nextBtn.onclick = () => { overlay.remove(); resolve(false); };
+            if (restartBtn) restartBtn.onclick = () => { incrementRepeatCount(); overlay.remove(); resolve(true); };
+        });
+        
         await showStep("¡Hola mi amor! 💖 Este juego fue creado por Yeffer Hurtado especialmente para ti. Cada carta es una sorpresa, reto o mensaje de corazón.");
         await showStep("🎀 Solo podrás abrir UNA carta por día. Así la emoción durará más y cada día tendrás un detalle nuevo.");
         
-        // Práctica interactiva: elegir carta
         enableSoundOnFirstTouch();
         const practiceOverlay = document.createElement('div');
         practiceOverlay.className = 'tutorial-overlay';
-        practiceOverlay.innerHTML = `<div class="tutorial-card"><p>✨ Ahora practiquemos. Toca cualquier carta que quieras para ver qué contiene. ¡No se guardará aún! ✨</p><div class="tutorial-buttons"><button class="btn-next" id="understoodPractice">Entendido, voy a tocar una</button></div></div>`;
+        practiceOverlay.innerHTML = `<div class="tutorial-card"><p>✨ Ahora practiquemos. Toca cualquier carta que quieras para ver qué contiene. ¡No se guardará aún! ✨</p><div class="tutorial-buttons"><button class="btn-next">Entendido, voy a tocar una</button></div></div>`;
         document.body.appendChild(practiceOverlay);
-        await new Promise((resolve) => {
-            const btn = document.getElementById('understoodPractice');
-            btn.onclick = () => {
-                practiceOverlay.remove();
-                resolve();
-            };
-        });
+        await new Promise((resolve) => { practiceOverlay.querySelector('.btn-next').onclick = () => { practiceOverlay.remove(); resolve(); }; });
         
-        // Esperar a que el usuario toque una carta (práctica)
         let practiceDone = false;
         let practiceCardIndex = -1;
         const originalHandler = window.handleCardClick;
@@ -669,8 +660,8 @@
                 modalContentDiv.innerHTML = '';
                 if (demoData.type === 'image') {
                     const img = document.createElement('img');
-                    img.src = demoData.value;
                     img.className = 'modal-img';
+                    setImageWithFallback(img, demoData.value);
                     modalContentDiv.appendChild(img);
                 } else {
                     const txt = document.createElement('div');
@@ -680,12 +671,8 @@
                 }
                 modal.style.display = 'flex';
                 if (cardElements[idx]) cardElements[idx].classList.add('flipped');
-            } else {
-                if (originalHandler) originalHandler(idx);
-            }
+            } else { if (originalHandler) originalHandler(idx); }
         };
-        
-        // Esperar a que cierre el modal
         await new Promise((resolve) => {
             const onModalClose = () => {
                 modal.removeEventListener('click', onModalCloseIfBg);
@@ -696,16 +683,10 @@
             modal.addEventListener('click', onModalCloseIfBg);
             closeModalBtn.addEventListener('click', onModalClose);
         });
-        
-        // Restaurar handler
         window.handleCardClick = originalHandler;
-        if (practiceCardIndex !== -1 && cardElements[practiceCardIndex]) {
-            cardElements[practiceCardIndex].classList.remove('flipped');
-        }
+        if (practiceCardIndex !== -1 && cardElements[practiceCardIndex]) cardElements[practiceCardIndex].classList.remove('flipped');
         
         await showStep("💕 ¡Muy bien! Así se ven las cartas cuando las desbloqueas. Ahora barajaremos todo para que sea una sorpresa total, y empezarás desde cero.");
-        
-        // REORDENAR ALEATORIAMENTE todas las cartas
         playSound('shuffle');
         currentCardsData = shuffleArray(ORIGINAL_CARDS);
         unlocked = new Array(TOTAL).fill(false);
@@ -713,18 +694,10 @@
         persistFullState();
         rebuildGridUI();
         updateUIStats();
-        
         await showStep("🃏 ¡Listo! Las cartas han cambiado de lugar. Ahora empieza la aventura de verdad. Recuerda: una carta por día. ¿Preparada?");
-        
-        // Pregunta final con opción repetir (si aún quedan repeticiones)
         const restart = await showStepWithOptionalRestart("¿Estás lista para comenzar? Cada día tendrás una nueva sorpresa. Presiona 'Siguiente' para empezar a jugar, o 'Repetir explicación' si quieres volver a ver la guía.");
-        
-        if (restart) {
-            // Reiniciar tutorial completo (ya se incrementó el contador dentro de showStepWithOptionalRestart)
-            tutorialActive = false;
-            startTutorial();
-            return;
-        } else {
+        if (restart) { tutorialActive = false; startTutorial(); return; }
+        else {
             localStorage.setItem('onboarding_complete', 'true');
             gameInitialized = true;
             tutorialActive = false;
@@ -741,10 +714,7 @@
             else globalMsgDiv.innerHTML = "🌟 Todas las cartas ya están abiertas, míralas tocando 🌟";
             return;
         }
-        if (unlocked[index]) {
-            showFullContent(index);
-            return;
-        }
+        if (unlocked[index]) { showFullContent(index); return; }
         if (!canUnlockNew()) {
             if (hasUnlockedToday()) globalMsgDiv.innerHTML = "⏳ Ya abriste una carta hoy. Vuelve mañana para otra sorpresa.";
             else if (!allUnlocked()) globalMsgDiv.innerHTML = "❓ Recuerda: solo una carta cada 24 horas.";
@@ -760,10 +730,9 @@
         globalMsgDiv.innerHTML = `🎉 ¡Carta desbloqueada! Tócala para ver a tamaño completo. 🎉`;
         if (allUnlocked()) playSound('shuffle');
     }
-
     window.handleCardClick = handleCardClick;
 
-    // Fondo rotatorio con imágenes femeninas
+    // Fondo rotatorio
     const BACKGROUND_IMAGES = ["./1.png", "./2.png", "./3.png"];
     let currentBgIndex = 0, bgInterval = null;
     function setBackgroundImage(url) { document.body.style.backgroundImage = `url('${url}')`; }
@@ -784,8 +753,22 @@
     const modal = document.getElementById('fullModal');
     const modalContentDiv = document.getElementById('modalContent');
     const closeModalBtn = document.getElementById('closeModalBtn');
+    const resetBtn = document.getElementById('resetGameBtn');
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     closeModalBtn.addEventListener('click', closeModal);
+    
+    // Configurar botón de reinicio: aparece solo una vez
+    if (shouldHideResetButton()) {
+        resetBtn.classList.add('hidden');
+    } else {
+        resetBtn.classList.remove('hidden');
+        markResetButtonAsShown();  // ya apareció, no volverá a mostrarse
+        resetBtn.addEventListener('click', () => {
+            if (confirm('¿Reiniciar todo el juego? Perderás el progreso actual y podrás elegir otra carta hoy. Este botón desaparecerá para siempre.')) {
+                fullReset();
+            }
+        });
+    }
 
     async function initGame() {
         startBackgroundRotation();
