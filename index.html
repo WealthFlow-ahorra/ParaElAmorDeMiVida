@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🌸 Para la niña mas consentida del mundo 🌸✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #ffdde1, #f9b7c2);
+            font-family: 'Segoe UI', 'Poppins', 'Quicksand', system-ui, -apple-system, 'Playfair Display', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            transition: background-image 1.2s ease-in-out;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 235, 240, 0.4);
+            backdrop-filter: brightness(1.02) blur(2px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .game-container {
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 245, 250, 0.75);
+            backdrop-filter: blur(18px);
+            border-radius: 3.5rem;
+            padding: 1.2rem 1rem 1.8rem;
+            box-shadow: 0 25px 45px rgba(255, 105, 180, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 200, 220, 0.8);
+            transition: all 0.2s;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFB7C5, #FF8DA1, #FF6F91);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 6px rgba(255, 100, 130, 0.3);
+            font-family: 'Playfair Display', cursive;
+        }
+        .sub {
+            font-size: 0.75rem;
+            background: rgba(255, 220, 230, 0.9);
+            display: inline-block;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            color: #B13E5C;
+            margin-top: 6px;
+            backdrop-filter: blur(4px);
+            font-weight: 600;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 225, 235, 0.85);
+            border-radius: 60px;
+            padding: 0.5rem 1.2rem;
+            margin: 1rem 0;
+            border: 1px solid #FFB7C5;
+            backdrop-filter: blur(4px);
+        }
+        .progress {
+            background: #FFB3C6;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #831D42;
+            font-size: 0.85rem;
+            box-shadow: inset 0 0 2px #fff8;
+        }
+        .daily {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #B13E5C;
+            font-weight: 600;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+        }
+
+        .card-container {
+            aspect-ratio: 1 / 1;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+            border-radius: 1.2rem;
+            box-shadow: 0 12px 20px rgba(0,0,0,0.2);
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-back {
+            background: radial-gradient(circle at 30% 25%, #FFC0D0, #FF9EBB);
+            background-image: repeating-linear-gradient(45deg, #FFE0EC 0px, #FFE0EC 3px, #FFB7C5 3px, #FFB7C5 8px);
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #FFF0F5;
+            text-shadow: 3px 3px 0 #C24A6E;
+            border: 2px solid #FFB3C6;
+        }
+        .card-front {
+            background: linear-gradient(145deg, #FFF9FC, #FFEEF4);
+            transform: rotateY(180deg);
+            border: 2px solid #FFA5BB;
+            overflow: hidden;
+        }
+        .card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1.1rem;
+        }
+        .card-text {
+            font-size: clamp(0.65rem, 3.5vw, 0.85rem);
+            font-weight: 800;
+            text-align: center;
+            color: #B13E5C;
+            background: #FFF3F8;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem;
+            word-break: break-word;
+            overflow-y: auto;
+            line-height: 1.3;
+            border-radius: 1.1rem;
+        }
+
+        .msg-area {
+            background: #FFE5EEdd;
+            backdrop-filter: blur(12px);
+            border-radius: 80px;
+            padding: 0.9rem 1rem;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #A13252;
+            margin-top: 0.8rem;
+            border: 2px solid #FF9EBB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-shadow: 0 1px 0 #FFF;
+            letter-spacing: 0.3px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-full {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-card {
+            background: #FFF5F9;
+            max-width: 90%;
+            max-height: 85%;
+            border-radius: 2.2rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 3px solid #FF9EBB;
+            animation: popModal 0.2s ease;
+            overflow: hidden;
+        }
+        .modal-img {
+            max-width: 100%;
+            max-height: 65vh;
+            object-fit: contain;
+            border-radius: 1.5rem;
+        }
+        .modal-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #A13252;
+            padding: 1rem;
+            text-align: center;
+            max-height: 60vh;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+        .close-modal {
+            margin-top: 1rem;
+            background: #FFB3C6;
+            border: none;
+            font-weight: bold;
+            padding: 0.5rem 1.8rem;
+            border-radius: 3rem;
+            cursor: pointer;
+            color: #631D38;
+            font-size: 1rem;
+        }
+        @keyframes popModal {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Tutorial con botón Siguiente */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+        .tutorial-card {
+            background: #FFF0F5f2;
+            max-width: 400px;
+            width: 85%;
+            padding: 2rem 1.8rem;
+            border-radius: 2.5rem;
+            color: #831D42;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid #FF9EBB;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.2);
+            line-height: 1.5;
+        }
+        .tutorial-card p {
+            margin-bottom: 1.5rem;
+        }
+        .tutorial-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn-next {
+            background: #FFB3C6;
+            border: none;
+            padding: 0.6rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #631D38;
+            cursor: pointer;
+            transition: 0.1s linear;
+        }
+        .btn-restart {
+            background: transparent;
+            border: 2px solid #FF9EBB;
+            color: #A13252;
+            padding: 0.6rem 1.4rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-next:active, .btn-restart:active { transform: scale(0.96); }
+
+        footer {
+            font-size: 0.65rem;
+            text-align: center;
+            margin-top: 0.8rem;
+            opacity: 0.9;
+            color: #B13E5C;
+            font-weight: 600;
+        }
+        @media (max-width: 550px) {
+            .cards-grid { gap: 0.5rem; }
+            .card-back { font-size: 1.8rem; }
+            .card-text { font-size: clamp(0.55rem, 3vw, 0.75rem); padding: 0.3rem; }
+            .title { font-size: 1.5rem; }
+            .msg-area { font-size: 0.85rem; padding: 0.7rem; min-height: 60px; }
+            .tutorial-card { font-size: 1rem; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameContainer">
+    <div class="header">
+        <div class="title">🌸 Para la niña mas consentida del mundo 🌸✨</div>
+    </div>
+    <div class="stats">
+        <div class="progress">🎀 <span id="progressCount">0</span> / 20</div>
+        <div class="daily">💖 <span id="dailyMsg">disponible</span></div>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div>
+    <div class="msg-area" id="globalMsg">💗 Toca una carta oculta para descubrir su secreto (1 por día)</div>
+    <footer>💌 Con todo mi corazón, Yeffer Hurtado para ti 💌</footer>
+</div>
+
+<div id="fullModal" class="modal-full">
+    <div class="modal-card">
+        <div id="modalContent"></div>
+        <button class="close-modal" id="closeModalBtn">Cerrar</button>
+    </div>
+</div>
+
+<script>
+    // ---------- DATOS ORIGINALES (20 cartas) ----------
+    const ORIGINAL_CARDS = [
+        { type: "image", value: "https://picsum.photos/id/104/300/300" },   
+        { type: "text",  value: "Hellen, te amo como nunca antes habia amado a otra persona, sos todo para mi, esto lo hago para que siempre lo recuerdes amor." },
+        { type: "image", value: "4.png" },   
+        { type: "text",  value: "Quiero una foto de una teta ahora mismo" },
+        { type: "image", value: "5.png" },   
+        { type: "text",  value: "Grabate haciendo 20 centadillas y envia el video a tu novio" },
+        { type: "image", value: "6.png" },    
+        { type: "text",  value: "Pidele a tu novio la foto que quieras, solo hoy" },
+        { type: "image", value: "7.png" },    
+        { type: "text",  value: "¿Sabes por te amo tanto?, te amo tanto porque eres esa niña que siempre estuve esperando a que llegara, te amo tanto porque a pesar de todos los problemas que tienes, siempre estas dispuesta a ayudarme, apoyarme en todo, te preocupas por mi. Y no te amo solo por eso mi amor, te amo tambien porque eres super hermosa, me encata tu cintura, tu sonrisa, tu voz, tu caracter, me encata todo de dia, y cada dia que pasa me enamoro mucho mas de lo que te imaginas." },
+        { type: "image", value: "1.png" },     
+        { type: "text",  value: "Amor podes decirme otra vez cuanto me queres? Amo cuando lo haces" },
+        { type: "image", value: "2.png" },     
+        { type: "text",  value: "Si desbloqueas esta carta el 30 de este mes, tienes un cupon de 300k en Shein" },
+        { type: "image", value: "3.png" },     
+        { type: "text",  value: "Cual es la foto tuya que mas te gusta?" },
+        { type: "image", value: "8.png" },     
+        { type: "text",  value: "Amor podes hacerme la pregunta que quieras" },
+        { type: "image", value: "9.png" },     
+        { type: "text",  value: "¿Que te gusta mas de mi?" }
+    ];
+    const TOTAL = 20;
+    const MAX_REPEATS = 2;  // Solo se puede repetir el tutorial 2 veces como máximo
+
+    let currentCardsData = [];
+    let unlocked = new Array(TOTAL).fill(false);
+    let lastUnlockDate = null;
+    let cardElements = [];
+    let gameInitialized = false;
+    let tutorialActive = false;
+
+    // --- Contador de repeticiones (persistente) ---
+    function getRepeatCount() {
+        const count = localStorage.getItem('tutorial_repeat_count');
+        return count !== null ? parseInt(count, 10) : 0;
+    }
+
+    function incrementRepeatCount() {
+        let current = getRepeatCount();
+        if (current < MAX_REPEATS) {
+            localStorage.setItem('tutorial_repeat_count', current + 1);
+        }
+    }
+
+    function canStillRepeat() {
+        return getRepeatCount() < MAX_REPEATS;
+    }
+
+    // --- Sonidos emocionantes ---
+    let audioCtx = null;
+    let soundEnabled = false;
+
+    function initAudio() {
+        if (audioCtx) return;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch(e) { console.warn("Web Audio no soportado"); }
+    }
+
+    function playSound(type) {
+        if (!soundEnabled || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+        if (type === 'flip') {
+            osc.frequency.value = 880;
+            osc.frequency.exponentialRampToValueAtTime(440, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'reveal') {
+            osc.frequency.value = 523.25;
+            osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.25);
+            osc.start(now);
+            osc.stop(now + 0.35);
+        } else if (type === 'shuffle') {
+            osc.frequency.value = 300;
+            osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        }
+    }
+
+    function enableSoundOnFirstTouch() {
+        if (soundEnabled) return;
+        initAudio();
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().then(() => {
+                soundEnabled = true;
+                playSound('reveal');
+            }).catch(e=>console.log);
+        } else if (audioCtx) {
+            soundEnabled = true;
+            playSound('reveal');
+        }
+    }
+
+    // Utilidades
+    function shuffleArray(arr) {
+        const array = [...arr];
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function getTodayStr() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function persistFullState() {
+        localStorage.setItem('hellen_cardOrder', JSON.stringify(currentCardsData));
+        localStorage.setItem('hellen_unlocked', JSON.stringify(unlocked));
+        if (lastUnlockDate) localStorage.setItem('hellen_lastDate', lastUnlockDate);
+        else localStorage.removeItem('hellen_lastDate');
+    }
+
+    function loadFullState() {
+        const storedOrder = localStorage.getItem('hellen_cardOrder');
+        const storedUnlocked = localStorage.getItem('hellen_unlocked');
+        const storedDate = localStorage.getItem('hellen_lastDate');
+        if (storedOrder) {
+            try {
+                const parsed = JSON.parse(storedOrder);
+                if (Array.isArray(parsed) && parsed.length === TOTAL) currentCardsData = parsed;
+                else currentCardsData = shuffleArray(ORIGINAL_CARDS);
+            } catch(e) { currentCardsData = shuffleArray(ORIGINAL_CARDS); }
+        } else { currentCardsData = shuffleArray(ORIGINAL_CARDS); }
+        if (storedUnlocked) {
+            try {
+                let arr = JSON.parse(storedUnlocked);
+                if (arr.length === TOTAL) unlocked = arr;
+                else unlocked = new Array(TOTAL).fill(false);
+            } catch(e) { unlocked = new Array(TOTAL).fill(false); }
+        } else { unlocked = new Array(TOTAL).fill(false); }
+        if (storedDate) lastUnlockDate = storedDate;
+        else lastUnlockDate = null;
+    }
+
+    function rebuildGridUI() {
+        gridContainer.innerHTML = '';
+        cardElements = [];
+        for (let i = 0; i < TOTAL; i++) {
+            const data = currentCardsData[i];
+            const container = document.createElement('div');
+            container.className = 'card-container';
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+            if (unlocked[i]) cardDiv.classList.add('flipped');
+            const front = document.createElement('div');
+            front.className = 'card-front';
+            if (data.type === 'image') {
+                const img = document.createElement('img');
+                img.src = data.value;
+                img.alt = `sorpresa ${i+1}`;
+                front.appendChild(img);
+            } else {
+                const textSpan = document.createElement('div');
+                textSpan.className = 'card-text';
+                textSpan.innerText = data.value;
+                front.appendChild(textSpan);
+            }
+            const back = document.createElement('div');
+            back.className = 'card-back';
+            back.innerText = '💗';
+            cardDiv.appendChild(front);
+            cardDiv.appendChild(back);
+            container.appendChild(cardDiv);
+            container.addEventListener('click', (idx => () => handleCardClick(idx))(i));
+            gridContainer.appendChild(container);
+            cardElements.push(cardDiv);
+        }
+    }
+
+    function updateUIStats() {
+        const count = unlocked.filter(v => v).length;
+        progressSpan.innerText = count;
+        if (allUnlocked()) {
+            dailyMsgSpan.innerText = "🏆 COMPLETADO";
+            if (gameInitialized) globalMsgDiv.innerHTML = "🎉 ¡Felicidades! Descubriste todos los secretos. Toca las cartas para ampliar 🎉";
+        } else if (hasUnlockedToday()) {
+            dailyMsgSpan.innerText = "⏳ Ya usaste tu carta hoy";
+        } else {
+            dailyMsgSpan.innerText = "✨ 1 carta disponible ✨";
+        }
+    }
+
+    function hasUnlockedToday() { return lastUnlockDate === getTodayStr(); }
+    function allUnlocked() { return unlocked.every(v => v === true); }
+    function canUnlockNew() { return !hasUnlockedToday() && !allUnlocked(); }
+
+    function showFullContent(idx) {
+        if (!unlocked[idx] && !allUnlocked()) return;
+        playSound('reveal');
+        const data = currentCardsData[idx];
+        modalContentDiv.innerHTML = '';
+        if (data.type === 'image') {
+            const imgBig = document.createElement('img');
+            imgBig.src = data.value;
+            imgBig.className = 'modal-img';
+            modalContentDiv.appendChild(imgBig);
+        } else {
+            const txtBig = document.createElement('div');
+            txtBig.className = 'modal-text';
+            txtBig.innerText = data.value;
+            modalContentDiv.appendChild(txtBig);
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() { modal.style.display = 'none'; }
+
+    // ---------- TUTORIAL PASO A PASO CON BOTÓN "SIGUIENTE" Y REPETICIÓN LIMITADA ----------
+    async function startTutorial() {
+        if (tutorialActive) return;
+        tutorialActive = true;
+        gameInitialized = false;
+        
+        // Aseguramos todas las cartas boca abajo
+        for (let i = 0; i < TOTAL; i++) if (cardElements[i]) cardElements[i].classList.remove('flipped');
+        
+        // Función para mostrar un paso con solo botón siguiente
+        const showStep = (message) => {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'tutorial-overlay';
+                const card = document.createElement('div');
+                card.className = 'tutorial-card';
+                card.innerHTML = `<p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next" id="nextStepBtn">Siguiente</button></div>`;
+                overlay.appendChild(card);
+                document.body.appendChild(overlay);
+                const nextBtn = document.getElementById('nextStepBtn');
+                const cleanup = () => {
+                    overlay.remove();
+                    resolve();
+                };
+                nextBtn.onclick = cleanup;
+            });
+        };
+
+        // Función para paso con posible botón repetir (solo si aún se puede repetir)
+        const showStepWithOptionalRestart = (message) => {
+            return new Promise((resolve) => {
+                const canRepeat = canStillRepeat();
+                const overlay = document.createElement('div');
+                overlay.className = 'tutorial-overlay';
+                const card = document.createElement('div');
+                card.className = 'tutorial-card';
+                if (canRepeat) {
+                    card.innerHTML = `<p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next" id="nextStepBtn">Siguiente</button><button class="btn-restart" id="restartTutoBtn">Repetir explicación</button></div>`;
+                } else {
+                    card.innerHTML = `<p>🌸 ${message}</p><div class="tutorial-buttons"><button class="btn-next" id="nextStepBtn">Siguiente</button></div>`;
+                }
+                overlay.appendChild(card);
+                document.body.appendChild(overlay);
+                const nextBtn = document.getElementById('nextStepBtn');
+                const restartBtn = document.getElementById('restartTutoBtn');
+                const cleanup = (restart = false) => {
+                    overlay.remove();
+                    resolve(restart);
+                };
+                nextBtn.onclick = () => cleanup(false);
+                if (restartBtn) restartBtn.onclick = () => {
+                    incrementRepeatCount();  // se usa una repetición
+                    cleanup(true);
+                };
+            });
+        };
+
+        // Pasos iniciales
+        await showStep("¡Hola mi amor! 💖 Este juego fue creado por Yeffer Hurtado especialmente para ti. Cada carta es una sorpresa, reto o mensaje de corazón.");
+        await showStep("🎀 Solo podrás abrir UNA carta por día. Así la emoción durará más y cada día tendrás un detalle nuevo.");
+        
+        // Práctica interactiva: elegir carta
+        enableSoundOnFirstTouch();
+        const practiceOverlay = document.createElement('div');
+        practiceOverlay.className = 'tutorial-overlay';
+        practiceOverlay.innerHTML = `<div class="tutorial-card"><p>✨ Ahora practiquemos. Toca cualquier carta que quieras para ver qué contiene. ¡No se guardará aún! ✨</p><div class="tutorial-buttons"><button class="btn-next" id="understoodPractice">Entendido, voy a tocar una</button></div></div>`;
+        document.body.appendChild(practiceOverlay);
+        await new Promise((resolve) => {
+            const btn = document.getElementById('understoodPractice');
+            btn.onclick = () => {
+                practiceOverlay.remove();
+                resolve();
+            };
+        });
+        
+        // Esperar a que el usuario toque una carta (práctica)
+        let practiceDone = false;
+        let practiceCardIndex = -1;
+        const originalHandler = window.handleCardClick;
+        window.handleCardClick = function(idx) {
+            if (!gameInitialized && tutorialActive && !practiceDone) {
+                enableSoundOnFirstTouch();
+                playSound('flip');
+                practiceDone = true;
+                practiceCardIndex = idx;
+                const demoData = currentCardsData[idx];
+                modalContentDiv.innerHTML = '';
+                if (demoData.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = demoData.value;
+                    img.className = 'modal-img';
+                    modalContentDiv.appendChild(img);
+                } else {
+                    const txt = document.createElement('div');
+                    txt.className = 'modal-text';
+                    txt.innerText = demoData.value;
+                    modalContentDiv.appendChild(txt);
+                }
+                modal.style.display = 'flex';
+                if (cardElements[idx]) cardElements[idx].classList.add('flipped');
+            } else {
+                if (originalHandler) originalHandler(idx);
+            }
+        };
+        
+        // Esperar a que cierre el modal
+        await new Promise((resolve) => {
+            const onModalClose = () => {
+                modal.removeEventListener('click', onModalCloseIfBg);
+                closeModalBtn.removeEventListener('click', onModalClose);
+                resolve();
+            };
+            const onModalCloseIfBg = (e) => { if (e.target === modal) onModalClose(); };
+            modal.addEventListener('click', onModalCloseIfBg);
+            closeModalBtn.addEventListener('click', onModalClose);
+        });
+        
+        // Restaurar handler
+        window.handleCardClick = originalHandler;
+        if (practiceCardIndex !== -1 && cardElements[practiceCardIndex]) {
+            cardElements[practiceCardIndex].classList.remove('flipped');
+        }
+        
+        await showStep("💕 ¡Muy bien! Así se ven las cartas cuando las desbloqueas. Ahora barajaremos todo para que sea una sorpresa total, y empezarás desde cero.");
+        
+        // REORDENAR ALEATORIAMENTE todas las cartas
+        playSound('shuffle');
+        currentCardsData = shuffleArray(ORIGINAL_CARDS);
+        unlocked = new Array(TOTAL).fill(false);
+        lastUnlockDate = null;
+        persistFullState();
+        rebuildGridUI();
+        updateUIStats();
+        
+        await showStep("🃏 ¡Listo! Las cartas han cambiado de lugar. Ahora empieza la aventura de verdad. Recuerda: una carta por día. ¿Preparada?");
+        
+        // Pregunta final con opción repetir (si aún quedan repeticiones)
+        const restart = await showStepWithOptionalRestart("¿Estás lista para comenzar? Cada día tendrás una nueva sorpresa. Presiona 'Siguiente' para empezar a jugar, o 'Repetir explicación' si quieres volver a ver la guía.");
+        
+        if (restart) {
+            // Reiniciar tutorial completo (ya se incrementó el contador dentro de showStepWithOptionalRestart)
+            tutorialActive = false;
+            startTutorial();
+            return;
+        } else {
+            localStorage.setItem('onboarding_complete', 'true');
+            gameInitialized = true;
+            tutorialActive = false;
+            updateUIStats();
+            globalMsgDiv.innerHTML = "🎀 ¡Juego listo! Recuerda: solo una carta por día. Vuelve mañana para más sorpresas. 🎀";
+        }
+    }
+
+    // ---------- LÓGICA DEL JUEGO (real) ----------
+    function handleCardClick(index) {
+        if (!gameInitialized || tutorialActive) return;
+        if (allUnlocked()) {
+            if (unlocked[index]) showFullContent(index);
+            else globalMsgDiv.innerHTML = "🌟 Todas las cartas ya están abiertas, míralas tocando 🌟";
+            return;
+        }
+        if (unlocked[index]) {
+            showFullContent(index);
+            return;
+        }
+        if (!canUnlockNew()) {
+            if (hasUnlockedToday()) globalMsgDiv.innerHTML = "⏳ Ya abriste una carta hoy. Vuelve mañana para otra sorpresa.";
+            else if (!allUnlocked()) globalMsgDiv.innerHTML = "❓ Recuerda: solo una carta cada 24 horas.";
+            return;
+        }
+        enableSoundOnFirstTouch();
+        playSound('flip');
+        unlocked[index] = true;
+        lastUnlockDate = getTodayStr();
+        persistFullState();
+        if (cardElements[index]) cardElements[index].classList.add('flipped');
+        updateUIStats();
+        globalMsgDiv.innerHTML = `🎉 ¡Carta desbloqueada! Tócala para ver a tamaño completo. 🎉`;
+        if (allUnlocked()) playSound('shuffle');
+    }
+
+    window.handleCardClick = handleCardClick;
+
+    // Fondo rotatorio con imágenes femeninas
+    const BACKGROUND_IMAGES = ["1.png", "2.png", "3.png"];
+    let currentBgIndex = 0, bgInterval = null;
+    function setBackgroundImage(url) { document.body.style.backgroundImage = `url('${url}')`; }
+    function rotateBackground() { currentBgIndex = (currentBgIndex + 1) % BACKGROUND_IMAGES.length; setBackgroundImage(BACKGROUND_IMAGES[currentBgIndex]); }
+    function startBackgroundRotation() {
+        const randomIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+        currentBgIndex = randomIndex;
+        setBackgroundImage(BACKGROUND_IMAGES[currentBgIndex]);
+        if (bgInterval) clearInterval(bgInterval);
+        bgInterval = setInterval(rotateBackground, 60000);
+    }
+
+    // Inicialización
+    const gridContainer = document.getElementById('cardsGrid');
+    const progressSpan = document.getElementById('progressCount');
+    const dailyMsgSpan = document.getElementById('dailyMsg');
+    const globalMsgDiv = document.getElementById('globalMsg');
+    const modal = document.getElementById('fullModal');
+    const modalContentDiv = document.getElementById('modalContent');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    closeModalBtn.addEventListener('click', closeModal);
+
+    async function initGame() {
+        startBackgroundRotation();
+        loadFullState();
+        rebuildGridUI();
+        updateUIStats();
+        const onboardingDone = localStorage.getItem('onboarding_complete');
+        if (!onboardingDone) {
+            for (let i = 0; i < TOTAL; i++) if (cardElements[i]) cardElements[i].classList.remove('flipped');
+            gameInitialized = false;
+            await startTutorial();
+        } else {
+            gameInitialized = true;
+            for (let i = 0; i < TOTAL; i++) {
+                if (unlocked[i]) cardElements[i].classList.add('flipped');
+                else cardElements[i].classList.remove('flipped');
+            }
+            updateUIStats();
+            if (!hasUnlockedToday() && !allUnlocked()) globalMsgDiv.innerHTML = "💎 ¡Toca una carta oculta! Solo una por día. 💎";
+            else if (hasUnlockedToday()) globalMsgDiv.innerHTML = "🌟 Ya usaste tu carta de hoy. Vuelve mañana por otra sorpresa 🌟";
+            else if (allUnlocked()) globalMsgDiv.innerHTML = "🏆 ¡Felicidades! Has completado todas las cartas. 🏆";
+        }
+    }
+    initGame();
+</script>
+</body>
+</html>
